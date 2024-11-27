@@ -1,0 +1,79 @@
+package JobFeed;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class JobRobotics_JobFeed {
+
+	public static WebDriver driver;
+
+	public static void main(String[] args) {
+
+		try {
+			WebDriverManager.chromedriver().setup();							
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("--force-device-scale-factor=0.8");
+			driver = new ChromeDriver(options);
+			driver.manage().window().maximize();
+
+			driver.get("https://www.fitpeo.com/");    
+			Thread.sleep(2000);
+			driver.findElement(By.xpath("//div[contains(text(),'Revenue Calculator')]")).click();
+			Thread.sleep(1500);
+
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			Thread.sleep(2000);
+			int InitialValue = 820;
+			WebElement Value_textField = driver.findElement(By.xpath("//input[@type='number']"));
+			js.executeScript("arguments[0].value = arguments[1];", Value_textField, InitialValue);
+
+			Thread.sleep(1000);
+			int UpdatedValue = 560;
+			WebElement UpdatedValue_textField = driver.findElement(By.xpath("//input[@type='number']"));
+			js.executeScript("arguments[0].value = arguments[1];", UpdatedValue_textField, UpdatedValue);
+
+			Thread.sleep(2000);
+			String Upd_sliderValue = UpdatedValue_textField.getAttribute("value");  
+			if (Upd_sliderValue.equals("560")) {
+				System.out.println("Slider successfully updated to reflect value: " + Upd_sliderValue);
+			} else {
+				System.out.println("Slider update failed. Current value: " + Upd_sliderValue);
+			}
+
+			Thread.sleep(2500);
+			String[] checkboxXpaths = {
+					"//div//p[normalize-space()='CPT-99091']//following::input[@type='checkbox'][1]",
+					"//*[normalize-space()='CPT-99453']//following::input[@type='checkbox'][1]",
+					"//*[normalize-space()='CPT-99454']//following::input[@type='checkbox'][1]",
+					"//*[normalize-space()='CPT-99474']//following::input[@type='checkbox'][1]"
+			};
+			for (String xpath : checkboxXpaths) {
+				WebElement checkbox = driver.findElement(By.xpath(xpath));
+				js.executeScript("arguments[0].scrollIntoView({block: 'center'});", checkbox);
+				Thread.sleep(1000); 
+				try {
+					checkbox.click();
+				} catch (ElementClickInterceptedException e) {
+					js.executeScript("arguments[0].click();", checkbox);
+				}
+				System.out.println("Clicked checkbox: " + xpath);
+			}
+
+			Thread.sleep(3000);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}
